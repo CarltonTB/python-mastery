@@ -6,3 +6,4 @@ class Stock:
 
     def cost(self) -> float:
         return self.shares * self.price
+
