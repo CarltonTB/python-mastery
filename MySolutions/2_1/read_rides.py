@@ -71,6 +71,22 @@ def read_rides_as_class_slots(filename):
 
     return records
 
+def read_rides_as_dicts(filename):
+    records = []
+    with open(filename) as f:
+        rows = csv.reader(f)
+        headings = next(rows)
+        for row in rows:
+            record = {
+                'route': row[0],
+                'date': row[1],
+                'daytype': row[2],
+                'rides': int(row[3]),
+            }
+            records.append(record)
+        return records
+
+
 if __name__ == '__main__':
     filename = '../../Data/ctabus.csv'
     import tracemalloc
@@ -92,4 +108,9 @@ if __name__ == '__main__':
     tracemalloc.start()
     rows = read_rides_as_class_slots(filename)
     print('Memory use with class slots: Current %d, Peak %d' % tracemalloc.get_traced_memory())
+
+    tracemalloc.stop()
+    tracemalloc.start()
+    rows = read_rides_as_dicts(filename)
+    print('Memory use with dicts: Current %d, Peak %d' % tracemalloc.get_traced_memory())
 
