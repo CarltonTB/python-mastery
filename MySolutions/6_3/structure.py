@@ -3,7 +3,7 @@ import inspect
 
 
 class Structure:
-    _fields: tuple[str]
+    _fields: tuple[str, ...]
 
     @staticmethod
     def _init():
@@ -15,7 +15,7 @@ class Structure:
     @classmethod
     def set_fields(cls):
         sig = inspect.signature(cls)
-        cls._fields = tuple(sig.parameters)
+        cls._fields = tuple(sig.parameters.keys())
 
     def __setattr__(self, field, val):
         if field not in self._fields and not field.startswith('_'):
