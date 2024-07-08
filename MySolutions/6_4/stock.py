@@ -1,0 +1,21 @@
+from structure import Structure
+
+class Stock(Structure):
+    _fields = ('name', 'shares', 'price')
+
+    @property
+    def cost(self):
+        return self.shares * self.price
+
+    def sell(self, n):
+        self.shares -= n
+
+
+class Date(Structure):
+    _fields = ('year', 'month', 'day')
+    pass
+
+
+Stock.create_init()
+Date.create_init()
+
