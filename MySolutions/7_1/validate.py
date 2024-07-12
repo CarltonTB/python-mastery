@@ -56,13 +56,32 @@ def validated(fn):
 
     def wrapper(*args, **kwargs):
         sig = inspect.signature(fn)
+        errors = ''
         for k, v in sig.bind(*args, **kwargs).arguments.items():
-            annotated_type = fn.__annotations__[k]
-            annotated_type.check(v)
+            try:
+                annotated_type = fn.__annotations__[k]
+            except KeyError:
+                continue
 
-        return fn(*args, **kwargs)
+            try:
+                annotated_type.check(v)
+            except Exception as e:
+                errors += f'{k}: {str(e)}\n'
 
-    return wrapper(fn)
+        if errors:
+            raise TypeError(f'Bad arguments:\n{errors}')
+
+        result = fn(*args, **kwargs)
+
+        if hasattr(sig.return_annotation, 'check'):
+            try:
+                sig.return_annotation.check(result)
+            except Exception as e:
+                raise TypeError(f'Bad return: {str(e)}')
+
+        return result 
+
+    return wrapper
 
 
 class PositiveInteger(Integer, Positive):
@@ -102,6 +121,7 @@ class Stock:
     def cost(self) -> float:
         return self.shares * self.price
 
-    def sell(self, n: int):
+    @validated
+    def sell(self, n: PositiveInteger):
         self.shares -= n
 
